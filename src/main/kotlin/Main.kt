@@ -1,28 +1,21 @@
-import androidx.compose.desktop.ui.tooling.preview.Preview
-import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
+import com.google.gson.GsonBuilder
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
-@Composable
-@Preview
-fun App() {
-    var text by remember { mutableStateOf("Hello, World!") }
-
-    MaterialTheme {
-        Button(onClick = {
-            text = "Hello, Desktop!"
-        }) {
-            Text(text)
-        }
-    }
-}
+val firebaseDatabaseAPI: FirebaseDatabaseAPI =
+    Retrofit.Builder().baseUrl(Constants.DB_BASE_URL).client(
+        OkHttpClient.Builder().addInterceptor(
+            HttpLoggingInterceptor().setLevel(Constants.LOGLEVEL)
+        ).build()
+    ).addConverterFactory(
+        GsonConverterFactory.create(
+            GsonBuilder().setLenient().serializeNulls().create()
+        )
+    ).build().create(FirebaseDatabaseAPI::class.java);
 
 fun main() = application {
     Window(onCloseRequest = ::exitApplication) {
