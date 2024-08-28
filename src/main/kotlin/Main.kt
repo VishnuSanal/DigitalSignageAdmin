@@ -20,5 +20,22 @@ val firebaseDatabaseAPI: FirebaseDatabaseAPI =
 fun main() = application {
     Window(onCloseRequest = ::exitApplication) {
         App()
+
+        /*
+        GlobalScope.launch {
+            firebaseDatabaseAPI.setAnnouncements(
+                listOf(
+                    Announcement("College buses depart at 14:30 today"),
+                    Announcement("Classes are suspended from 15:00"),
+                    Announcement("Library will be open till 21:30 until exams are over"),
+                    Announcement("Knimbus Digital Library registration ends tomorrow"),
+                    Announcement("S2 exam registration deadline extended"),
+                    Announcement("Digital Signage system back up again!"),
+                    Announcement("Tomorrow is a holiday!"),
+                )
+            )
+        }
+        */
+
     }
 }

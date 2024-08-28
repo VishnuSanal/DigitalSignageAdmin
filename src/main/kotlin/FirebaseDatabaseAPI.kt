@@ -4,11 +4,11 @@ import retrofit2.http.GET
 import retrofit2.http.PUT
 
 interface FirebaseDatabaseAPI {
-    @GET("/notifications.json/")
-    suspend fun getNotifications(): Response<List<String>>
+    @GET("/announcements.json/")
+    suspend fun getAnnouncements(): Response<List<Announcement>>
 
-    @PUT("/notifications.json/")
-    suspend fun setNotifications(
-        @Body classList: List<String>
+    @PUT("/announcements.json/")
+    suspend fun setAnnouncements(
+        @Body announcements: List<Announcement>
     )
 }

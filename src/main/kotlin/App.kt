@@ -56,12 +56,13 @@ fun App() {
 
     val coroutineScope = rememberCoroutineScope()
 
-    val contentList = remember { mutableStateListOf<String>("Loading...") }
+    val contentList =
+        remember { mutableStateListOf<Announcement>(Announcement(title = "Loading...")) }
 
     var showAddNewDialog by remember { mutableStateOf(false) }
 
     coroutineScope.launch(Dispatchers.Default) {
-        val response = firebaseDatabaseAPI.getNotifications()
+        val response = firebaseDatabaseAPI.getAnnouncements()
 
         if (response.isSuccessful && response.body() != null) {
             contentList.clear()
@@ -118,7 +119,7 @@ fun App() {
                             Text(
                                 modifier = Modifier.wrapContentHeight().fillMaxWidth(0.9f)
                                     .padding(32.dp),
-                                text = it,
+                                text = it.title,
                                 fontFamily = fontFamily,
                                 fontSize = 44.sp,
                                 fontWeight = FontWeight.W200,
@@ -133,9 +134,9 @@ fun App() {
                                 coroutineScope.launch(Dispatchers.Default) {
                                     contentList.remove(it)
 
-                                    firebaseDatabaseAPI.setNotifications(contentList)
+                                    firebaseDatabaseAPI.setAnnouncements(contentList)
 
-                                    val response = firebaseDatabaseAPI.getNotifications()
+                                    val response = firebaseDatabaseAPI.getAnnouncements()
 
                                     if (response.isSuccessful && response.body() != null) {
                                         contentList.clear()
@@ -169,7 +170,7 @@ fun App() {
             ),
         ) {
 
-            var announcement by remember { mutableStateOf("") }
+            var announcementTitle by remember { mutableStateOf("") }
             var buttonText by remember { mutableStateOf("Confirm") }
 
             Card(
@@ -195,7 +196,7 @@ fun App() {
 
                     OutlinedTextField(
                         modifier = Modifier.align(Alignment.CenterHorizontally).padding(16.dp),
-                        value = announcement,
+                        value = announcementTitle,
                         label = {
                             Text(
                                 modifier = Modifier,
@@ -217,7 +218,7 @@ fun App() {
                             color = Constants.COLOR_TEXT
                         ),
                         onValueChange = {
-                            announcement = it
+                            announcementTitle = it
                         },
                         leadingIcon = {
                             Icon(
@@ -245,7 +246,7 @@ fun App() {
 
                             coroutineScope.launch(Dispatchers.Default) {
 
-                                if (announcement.isBlank()) {
+                                if (announcementTitle.isBlank()) {
 
                                     buttonText = "Field Empty!!"
                                     delay(1000)
@@ -254,11 +255,12 @@ fun App() {
                                     return@launch
                                 }
 
-                                contentList.add(announcement)
+                                contentList.remove(Announcement(title = "Loading...")) // ;)
+                                contentList.add(Announcement(title = announcementTitle))
 
-                                firebaseDatabaseAPI.setNotifications(contentList)
+                                firebaseDatabaseAPI.setAnnouncements(contentList)
 
-                                val response = firebaseDatabaseAPI.getNotifications()
+                                val response = firebaseDatabaseAPI.getAnnouncements()
 
                                 if (response.isSuccessful && response.body() != null) {
                                     contentList.clear()
