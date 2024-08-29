@@ -69,14 +69,14 @@ fun App() {
 
     var showAddNewDialog by remember { mutableStateOf(false) }
 
-//    coroutineScope.launch(Dispatchers.Default) {
-//        val response = firebaseDatabaseAPI.getAnnouncements()
-//
-//        if (response.isSuccessful && response.body() != null) {
-//            contentList.clear()
-//            contentList.addAll(response.body()!!)
-//        }
-//    }
+    coroutineScope.launch(Dispatchers.Default) {
+        val response = firebaseDatabaseAPI.getAnnouncements()
+
+        if (response.isSuccessful && response.body() != null) {
+            contentList.clear()
+            contentList.addAll(response.body()!!)
+        }
+    }
 
     MaterialTheme {
 
@@ -124,17 +124,32 @@ fun App() {
                         shape = RoundedCornerShape(16.dp)
                     ) {
                         Row {
-                            Text(
-                                modifier = Modifier.wrapContentHeight().fillMaxWidth(0.9f)
-                                    .padding(32.dp),
-                                text = it.title,
-                                fontFamily = fontFamily,
-                                fontSize = 44.sp,
-                                fontWeight = FontWeight.W200,
-                                lineHeight = 64.sp,
-                                textAlign = TextAlign.Center,
-                                color = Constants.COLOR_TEXT
-                            )
+                            Column {
+                                Text(
+                                    modifier = Modifier.wrapContentHeight().fillMaxWidth(0.9f)
+                                        .padding(vertical = 16.dp, horizontal = 32.dp),
+                                    text = it.title,
+                                    fontFamily = fontFamily,
+                                    fontSize = 44.sp,
+                                    fontWeight = FontWeight.W200,
+                                    lineHeight = 64.sp,
+                                    textAlign = TextAlign.Start,
+                                    color = Constants.COLOR_TEXT
+                                )
+
+                                if (it.message != null)
+                                    Text(
+                                        modifier = Modifier.wrapContentHeight().fillMaxWidth(0.9f)
+                                            .padding(vertical = 8.dp, horizontal = 32.dp),
+                                        text = it.message!!,
+                                        fontFamily = fontFamily,
+                                        fontSize = 32.sp,
+                                        fontWeight = FontWeight.W200,
+                                        lineHeight = 44.sp,
+                                        textAlign = TextAlign.Start,
+                                        color = Constants.COLOR_TEXT
+                                    )
+                            }
 
                             IconButton(modifier = Modifier.align(Alignment.CenterVertically)
                                 .wrapContentWidth().fillMaxWidth().size(48.dp).aspectRatio(1f)
@@ -166,7 +181,7 @@ fun App() {
         }
     }
 
-    if (true) { // FIXME
+    if (showAddNewDialog) {
         Dialog(
             onDismissRequest = {
                 showAddNewDialog = false
@@ -178,10 +193,12 @@ fun App() {
             ),
         ) {
 
-            var announcementTitle by remember { mutableStateOf("") }
-            var buttonText by remember { mutableStateOf("Confirm") }
-
             var announcementType by remember { mutableStateOf("Text") }
+
+            var announcementTitle by remember { mutableStateOf("") }
+            var announcementMessage by remember { mutableStateOf("") }
+
+            var buttonText by remember { mutableStateOf("Confirm") }
 
             Card(
                 modifier = Modifier.fillMaxWidth(0.5f).wrapContentHeight()
@@ -210,7 +227,7 @@ fun App() {
                         label = {
                             Text(
                                 modifier = Modifier,
-                                text = "New Announcement",
+                                text = "Title",
                                 fontFamily = fontFamily,
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.W100,
@@ -229,11 +246,6 @@ fun App() {
                         ),
                         onValueChange = {
                             announcementTitle = it
-                        },
-                        leadingIcon = {
-                            Icon(
-                                painterResource("add.png"), "add icon"
-                            )
                         },
                         colors = TextFieldDefaults.outlinedTextFieldColors(
                             backgroundColor = Constants.COLOR_BG,
@@ -290,6 +302,48 @@ fun App() {
                         }
                     }
 
+                    when (announcementType) {
+                        "Text" -> {
+                            OutlinedTextField(
+                                modifier = Modifier.align(Alignment.CenterHorizontally)
+                                    .padding(16.dp),
+                                value = announcementMessage,
+                                label = {
+                                    Text(
+                                        modifier = Modifier,
+                                        text = "Message",
+                                        fontFamily = fontFamily,
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.W100,
+                                        lineHeight = 16.sp,
+                                        textAlign = TextAlign.Center,
+                                        color = Constants.COLOR_TEXT
+                                    )
+                                },
+                                textStyle = TextStyle(
+                                    fontFamily = fontFamily,
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.W100,
+                                    lineHeight = 16.sp,
+                                    textAlign = TextAlign.Start,
+                                    color = Constants.COLOR_TEXT
+                                ),
+                                onValueChange = {
+                                    announcementMessage = it
+                                },
+                                colors = TextFieldDefaults.outlinedTextFieldColors(
+                                    backgroundColor = Constants.COLOR_BG,
+                                    textColor = Constants.COLOR_TEXT,
+                                    unfocusedLabelColor = Constants.COLOR_TEXT,
+                                    focusedLabelColor = Constants.COLOR_TEXT,
+                                    placeholderColor = Constants.COLOR_TEXT,
+                                    leadingIconColor = Constants.COLOR_TEXT,
+                                ),
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                            )
+                        }
+                    }
+
                     TextButton(
                         modifier = Modifier.align(Alignment.End).padding(8.dp),
                         colors = ButtonDefaults.outlinedButtonColors(
@@ -300,17 +354,26 @@ fun App() {
 
                             coroutineScope.launch(Dispatchers.Default) {
 
-                                if (announcementTitle.isBlank()) {
-
+                                if (
+                                    announcementTitle.isBlank() ||
+                                    (announcementType.equals("Text") && announcementMessage.isBlank())
+                                ) {
                                     buttonText = "Field Empty!!"
                                     delay(1000)
-                                    buttonText = "Register"
+                                    buttonText = "Submit"
 
                                     return@launch
                                 }
 
                                 contentList.remove(Announcement(title = "Loading...")) // ;)
-                                contentList.add(Announcement(title = announcementTitle))
+
+                                val announcement = Announcement(title = announcementTitle)
+
+                                when (announcementType) {
+                                    "Text" -> announcement.message = announcementMessage
+                                }
+
+                                contentList.add(announcement)
 
                                 firebaseDatabaseAPI.setAnnouncements(contentList)
 

@@ -1,6 +1,6 @@
 data class Announcement(
-    val title: String,
-    val message: String? = null,
-    val imagePath: String? = null,
-    val videoPath: String? = null,
+    var title: String,
+    var message: String? = null,
+    var imagePath: String? = null,
+    var videoPath: String? = null,
 )
