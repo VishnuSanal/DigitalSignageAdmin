@@ -13,10 +13,14 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
+import androidx.compose.material.ChipDefaults
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.FilterChip
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -24,6 +28,8 @@ import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -33,6 +39,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
@@ -50,6 +57,7 @@ import kotlinx.coroutines.launch
 
 private val fontFamily = FontFamily(Font(resource = "poppins.ttf"))
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 @Preview
 fun App() {
@@ -61,14 +69,14 @@ fun App() {
 
     var showAddNewDialog by remember { mutableStateOf(false) }
 
-    coroutineScope.launch(Dispatchers.Default) {
-        val response = firebaseDatabaseAPI.getAnnouncements()
-
-        if (response.isSuccessful && response.body() != null) {
-            contentList.clear()
-            contentList.addAll(response.body()!!)
-        }
-    }
+//    coroutineScope.launch(Dispatchers.Default) {
+//        val response = firebaseDatabaseAPI.getAnnouncements()
+//
+//        if (response.isSuccessful && response.body() != null) {
+//            contentList.clear()
+//            contentList.addAll(response.body()!!)
+//        }
+//    }
 
     MaterialTheme {
 
@@ -158,7 +166,7 @@ fun App() {
         }
     }
 
-    if (showAddNewDialog) {
+    if (true) { // FIXME
         Dialog(
             onDismissRequest = {
                 showAddNewDialog = false
@@ -172,6 +180,8 @@ fun App() {
 
             var announcementTitle by remember { mutableStateOf("") }
             var buttonText by remember { mutableStateOf("Confirm") }
+
+            var announcementType by remember { mutableStateOf("Text") }
 
             Card(
                 modifier = Modifier.fillMaxWidth(0.5f).wrapContentHeight()
@@ -235,6 +245,50 @@ fun App() {
                         ),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                     )
+
+                    Row(Modifier.align(Alignment.CenterHorizontally)) {
+                        listOf("Text", "Image", "Video").forEach {
+                            FilterChip(
+                                modifier = Modifier.padding(8.dp),
+                                onClick = {
+                                    announcementType = it
+                                },
+                                selected = announcementType.equals(it),
+                                leadingIcon = if (announcementType.equals(it)) {
+                                    {
+                                        Icon(
+                                            modifier = Modifier
+                                                .padding(4.dp)
+                                                .clip(CircleShape)
+                                                .background(Constants.COLOR_BG)
+                                                .padding(4.dp)
+                                                .align(Alignment.CenterVertically),
+                                            imageVector = Icons.Filled.Done,
+                                            contentDescription = "Done icon",
+                                        )
+                                    }
+                                } else {
+                                    null
+                                },
+                                colors = ChipDefaults.filterChipColors(
+                                    backgroundColor = Constants.COLOR_CARD,
+                                    contentColor = Constants.COLOR_TEXT,
+                                ),
+                                content = {
+                                    Text(
+                                        modifier = Modifier,
+                                        text = it,
+                                        fontFamily = fontFamily,
+                                        fontSize = 16.sp,
+                                        fontWeight = FontWeight.W200,
+                                        lineHeight = 24.sp,
+                                        textAlign = TextAlign.Center,
+                                        color = Constants.COLOR_TEXT
+                                    )
+                                },
+                            )
+                        }
+                    }
 
                     TextButton(
                         modifier = Modifier.align(Alignment.End).padding(8.dp),
