@@ -32,5 +32,5 @@ jobs:
       - name: Upload Executable
         uses: actions/upload-artifact@v4
         with:
-          name: admin.apk
-          path: /DigitalSignageAdmin/build/compose/jars/*.jar
+          name: admin.jar
+          path: /DigitalSignageAdmin/DigitalSignageAdmin/build/compose/jars/*.jar
