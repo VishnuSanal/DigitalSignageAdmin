@@ -3,4 +3,6 @@ data class Announcement(
     var message: String? = null,
     var imagePath: String? = null,
     var videoPath: String? = null,
-)
+) {
+    constructor() : this("Loading...")
+}
