@@ -36,22 +36,22 @@ compose.desktop {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             includeAllModules = true
 
-            packageName = "DigitalSignage"
+            packageName = "DigitalSignageAdmin"
             packageVersion = "1.0.0"
 
-            description = "GEC PKD Digital Signage System"
+            description = "GEC PKD Digital Signage System (Server)"
             copyright = "Copyright (C) 2024 Vishnu Sanal T"
 
-//            licenseFile.set(project.file("LICENSE.txt"))
-//            macOS {
-//                iconFile.set(project.file("icon.png"))
-//            }
-//            windows {
-//                iconFile.set(project.file("icon.png"))
-//            }
-//            linux {
-//                iconFile.set(project.file("icon.png"))
-//            }
+            licenseFile.set(project.file("LICENSE.txt"))
+            macOS {
+                iconFile.set(project.file("icon.png"))
+            }
+            windows {
+                iconFile.set(project.file("icon.png"))
+            }
+            linux {
+                iconFile.set(project.file("icon.png"))
+            }
         }
 
         buildTypes.release.proguard {
