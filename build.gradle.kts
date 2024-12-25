@@ -42,16 +42,16 @@ compose.desktop {
             description = "GEC PKD Digital Signage System (Server)"
             copyright = "Copyright (C) 2024 Vishnu Sanal T"
 
-            licenseFile.set(project.file("LICENSE.txt"))
-            macOS {
-                iconFile.set(project.file("icon.png"))
-            }
-            windows {
-                iconFile.set(project.file("icon.png"))
-            }
-            linux {
-                iconFile.set(project.file("icon.png"))
-            }
+            licenseFile.set(project.file("LICENSE"))
+//            macOS {
+//                iconFile.set(project.file("icon.png"))
+//            }
+//            windows {
+//                iconFile.set(project.file("icon.png"))
+//            }
+//            linux {
+//                iconFile.set(project.file("icon.png"))
+//            }
         }
 
         buildTypes.release.proguard {
