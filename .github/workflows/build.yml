@@ -23,14 +23,14 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Build JAR
-        run: ./gradlew packageReleaseUberJarForCurrentOS
+      #      - name: Build JAR
+      #        run: ./gradlew packageReleaseUberJarForCurrentOS
 
-      - name: Upload JAR
-        uses: actions/upload-artifact@v4
-        with:
-          name: admin.jar
-          path: build/compose/jars/*.jar
+      #      - name: Upload JAR
+      #        uses: actions/upload-artifact@v4
+      #        with:
+      #          name: admin.jar
+      #          path: build/compose/jars/*.jar
 
       - name: Build DEB
         run: ./gradlew packageDeb
@@ -40,3 +40,12 @@ jobs:
         with:
           name: admin.deb
           path: build/compose/binaries/main/deb/*.deb
+
+      - name: Build MSI
+        run: ./gradlew packageMsi
+
+      - name: Upload MSI
+        uses: actions/upload-artifact@v4
+        with:
+          name: admin.msi
+          path: build/compose/binaries/main/msi/*.msi
