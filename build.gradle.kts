@@ -31,7 +31,8 @@ compose.desktop {
     application {
         mainClass = "MainKt"
 
-        //      https://github.com/JetBrains/compose-multiplatform/blob/master/tutorials/Native_distributions_and_local_execution/README.md
+        //      https://github.com/JetBrains/compose-multiplatform/blob/ac1d6e7340c1e2c85170c731fc143b7be2eba9c4/tutorials/Native_distributions_and_local_execution/README.md
+        //      warning: deprecated docs
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             includeAllModules = true
