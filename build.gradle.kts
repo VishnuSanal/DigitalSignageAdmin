@@ -34,7 +34,7 @@ compose.desktop {
         //      https://github.com/JetBrains/compose-multiplatform/blob/ac1d6e7340c1e2c85170c731fc143b7be2eba9c4/tutorials/Native_distributions_and_local_execution/README.md
         //      warning: deprecated docs
         nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+            targetFormats(TargetFormat.Dmg, TargetFormat.Exe, TargetFormat.Deb)
             includeAllModules = true
 
             packageName = "DigitalSignageAdmin"
