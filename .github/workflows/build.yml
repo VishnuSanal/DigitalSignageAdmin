@@ -32,15 +32,6 @@ jobs:
           name: admin.deb
           path: build/compose/binaries/main/deb/*.deb
 
-      - name: Build MSI
-        run: ./gradlew packageMsi
-
-      - name: Upload MSI
-        uses: actions/upload-artifact@v4
-        with:
-          name: admin.msi
-          path: build/compose/binaries/main/msi/*.msi
-
   build-windows:
     name: Build Executable on Windows
     runs-on: windows-latest
@@ -64,5 +55,5 @@ jobs:
       - name: Upload EXE
         uses: actions/upload-artifact@v4
         with:
-          name: admin.msi
+          name: admin.exe
           path: build/compose/binaries/main/exe/*.exe
