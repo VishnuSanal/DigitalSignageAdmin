@@ -376,10 +376,7 @@ fun App() {
 
                             coroutineScope.launch(Dispatchers.Default) {
 
-                                if (
-                                    announcementTitle.isBlank() ||
-                                    (announcementType.equals("Text") && announcementMessage.isBlank())
-                                ) {
+                                if (announcementTitle.isBlank()) {
                                     buttonText = "Field Empty!!"
                                     delay(1000)
                                     buttonText = "Submit"
@@ -389,10 +386,10 @@ fun App() {
 
                                 contentList.remove(Announcement(title = "Loading...")) // ;)
 
-                                val announcement = Announcement(title = announcementTitle)
+                                val announcement = Announcement(title = announcementTitle.trim())
 
                                 when (announcementType) {
-                                    "Text" -> announcement.message = announcementMessage
+                                    "Text" -> announcement.message = announcementMessage.trim()
                                 }
 
                                 if (addEditDialogEditItem != null)
