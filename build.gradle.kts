@@ -25,6 +25,9 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-scalars:2.11.0")
     implementation("com.squareup.retrofit2:converter-gson:2.11.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+
+    implementation("ch.qos.logback:logback-classic:1.2.10")
+    implementation("ch.qos.logback:logback-core:1.2.10")
 }
 
 compose.desktop {

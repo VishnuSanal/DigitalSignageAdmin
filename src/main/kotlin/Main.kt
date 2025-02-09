@@ -6,6 +6,8 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -20,6 +22,8 @@ val firebaseDatabaseAPI: FirebaseDatabaseAPI =
                 .setLenient().serializeNulls().create()
         )
     ).build().create(FirebaseDatabaseAPI::class.java);
+
+val logger: Logger = LoggerFactory.getLogger("DigitalSignageAdmin")
 
 fun main() = application {
     Window(onCloseRequest = ::exitApplication) {
