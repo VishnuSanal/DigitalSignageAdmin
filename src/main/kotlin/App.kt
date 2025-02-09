@@ -67,7 +67,8 @@ fun App() {
     val contentList =
         remember { mutableStateListOf<Announcement>(Announcement(title = "Loading...")) }
 
-    var showAddNewDialog by remember { mutableStateOf(false) }
+    var showAddEditDialog by remember { mutableStateOf(false) }
+    var addEditDialogEditItem by remember { mutableStateOf<Announcement?>(null) }
 
     coroutineScope.launch(Dispatchers.Default) {
         val response = firebaseDatabaseAPI.getAnnouncements()
@@ -101,7 +102,8 @@ fun App() {
                 IconButton(modifier = Modifier.align(Alignment.CenterVertically).wrapContentWidth()
                     .fillMaxWidth().size(96.dp).aspectRatio(1f).background(Constants.COLOR_BG)
                     .padding(8.dp), onClick = {
-                    showAddNewDialog = true
+                    addEditDialogEditItem = null
+                    showAddEditDialog = true
                 }, content = {
                     Icon(
                         modifier = Modifier.wrapContentWidth().fillMaxWidth(),
@@ -152,8 +154,7 @@ fun App() {
                             }
 
                             IconButton(modifier = Modifier.align(Alignment.CenterVertically)
-                                .wrapContentWidth().fillMaxWidth().size(48.dp).aspectRatio(1f)
-                                .padding(8.dp), onClick = {
+                                .padding(16.dp).size(48.dp).aspectRatio(1f), onClick = {
                                 coroutineScope.launch(Dispatchers.Default) {
                                     contentList.remove(it)
 
@@ -174,6 +175,21 @@ fun App() {
                                     contentDescription = "delete icon"
                                 )
                             })
+
+                            IconButton(modifier = Modifier.align(Alignment.CenterVertically)
+                                .padding(16.dp).size(48.dp).aspectRatio(1f), onClick = {
+                                coroutineScope.launch(Dispatchers.Default) {
+                                    addEditDialogEditItem = it
+                                    showAddEditDialog = true
+                                }
+                            }, content = {
+                                Icon(
+                                    modifier = Modifier.wrapContentWidth().fillMaxWidth(),
+                                    painter = painterResource("edit.png"),
+                                    tint = Constants.COLOR_TEXT,
+                                    contentDescription = "edit icon"
+                                )
+                            })
                         }
                     }
                 }
@@ -181,10 +197,11 @@ fun App() {
         }
     }
 
-    if (showAddNewDialog) {
+    if (showAddEditDialog) {
         Dialog(
             onDismissRequest = {
-                showAddNewDialog = false
+                addEditDialogEditItem = null
+                showAddEditDialog = false
             },
             properties = DialogProperties(
                 usePlatformDefaultWidth = false,
@@ -195,8 +212,12 @@ fun App() {
 
             var announcementType by remember { mutableStateOf("Text") }
 
-            var announcementTitle by remember { mutableStateOf("") }
-            var announcementMessage by remember { mutableStateOf("") }
+            var announcementTitle by remember { mutableStateOf(addEditDialogEditItem?.title ?: "") }
+            var announcementMessage by remember {
+                mutableStateOf(
+                    addEditDialogEditItem?.message ?: ""
+                )
+            }
 
             var buttonText by remember { mutableStateOf("Confirm") }
 
@@ -258,6 +279,7 @@ fun App() {
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                     )
 
+                    // todo: handle edits for images and videos
                     Row(Modifier.align(Alignment.CenterHorizontally)) {
                         listOf("Text", "Image", "Video").forEach {
                             FilterChip(
@@ -373,6 +395,9 @@ fun App() {
                                     "Text" -> announcement.message = announcementMessage
                                 }
 
+                                if (addEditDialogEditItem != null)
+                                    contentList.remove(addEditDialogEditItem)
+
                                 contentList.add(announcement)
 
                                 firebaseDatabaseAPI.setAnnouncements(contentList)
@@ -384,7 +409,7 @@ fun App() {
                                     contentList.addAll(response.body()!!)
                                 }
 
-                                showAddNewDialog = false
+                                showAddEditDialog = false
                             }
                         },
                         content = {
