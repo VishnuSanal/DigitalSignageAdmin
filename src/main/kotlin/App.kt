@@ -31,8 +31,8 @@ import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -62,22 +62,14 @@ private val fontFamily = FontFamily(Font(resource = "poppins.ttf"))
 @Preview
 fun App() {
 
+    val mainViewModel = remember { MainViewModel() }
+
     val coroutineScope = rememberCoroutineScope()
 
-    val contentList =
-        remember { mutableStateListOf<Announcement>(Announcement(title = "Loading...")) }
+    val contentList by mainViewModel.announcements.collectAsState()
 
     var showAddEditDialog by remember { mutableStateOf(false) }
     var addEditDialogEditItem by remember { mutableStateOf<Announcement?>(null) }
-
-    coroutineScope.launch(Dispatchers.Default) {
-        val response = firebaseDatabaseAPI.getAnnouncements()
-
-        if (response.isSuccessful && response.body() != null) {
-            contentList.clear()
-            contentList.addAll(response.body()!!)
-        }
-    }
 
     MaterialTheme {
 
@@ -156,16 +148,7 @@ fun App() {
                             IconButton(modifier = Modifier.align(Alignment.CenterVertically)
                                 .padding(16.dp).size(48.dp).aspectRatio(1f), onClick = {
                                 coroutineScope.launch(Dispatchers.Default) {
-                                    contentList.remove(it)
-
-                                    firebaseDatabaseAPI.setAnnouncements(contentList)
-
-                                    val response = firebaseDatabaseAPI.getAnnouncements()
-
-                                    if (response.isSuccessful && response.body() != null) {
-                                        contentList.clear()
-                                        contentList.addAll(response.body()!!)
-                                    }
+                                    mainViewModel.delete(it)
                                 }
                             }, content = {
                                 Icon(
@@ -373,7 +356,6 @@ fun App() {
                         ),
                         contentPadding = PaddingValues(vertical = 16.dp, horizontal = 16.dp),
                         onClick = {
-
                             coroutineScope.launch(Dispatchers.Default) {
 
                                 if (announcementTitle.isBlank()) {
@@ -384,8 +366,6 @@ fun App() {
                                     return@launch
                                 }
 
-                                contentList.remove(Announcement(title = "Loading...")) // ;)
-
                                 val announcement = Announcement(title = announcementTitle.trim())
 
                                 when (announcementType) {
@@ -393,18 +373,9 @@ fun App() {
                                 }
 
                                 if (addEditDialogEditItem != null)
-                                    contentList.remove(addEditDialogEditItem)
-
-                                contentList.add(announcement)
-
-                                firebaseDatabaseAPI.setAnnouncements(contentList)
-
-                                val response = firebaseDatabaseAPI.getAnnouncements()
-
-                                if (response.isSuccessful && response.body() != null) {
-                                    contentList.clear()
-                                    contentList.addAll(response.body()!!)
-                                }
+                                    mainViewModel.edit(announcement, addEditDialogEditItem!!)
+                                else
+                                    mainViewModel.add(announcement)
 
                                 showAddEditDialog = false
                             }
