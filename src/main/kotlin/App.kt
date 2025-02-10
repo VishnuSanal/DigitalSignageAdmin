@@ -51,6 +51,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import coil3.compose.AsyncImage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -201,8 +202,20 @@ fun App() {
                     addEditDialogEditItem?.message ?: ""
                 )
             }
+            var announcementImageLink by remember {
+                mutableStateOf(
+                    addEditDialogEditItem?.imagePath ?: ""
+                )
+            }
 
-            var buttonText by remember { mutableStateOf("Confirm") }
+            var buttonText by remember {
+                mutableStateOf(
+                    if (announcementType == "Image")
+                        "Preview"
+                    else
+                        "Confirm"
+                )
+            }
 
             Card(
                 modifier = Modifier.fillMaxWidth(0.5f).wrapContentHeight()
@@ -347,6 +360,52 @@ fun App() {
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                             )
                         }
+
+                        "Image" -> {
+                            OutlinedTextField(
+                                modifier = Modifier.align(Alignment.CenterHorizontally)
+                                    .padding(16.dp),
+                                value = announcementImageLink,
+                                label = {
+                                    Text(
+                                        modifier = Modifier,
+                                        text = "Valid Image Link",
+                                        fontFamily = fontFamily,
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.W100,
+                                        lineHeight = 16.sp,
+                                        textAlign = TextAlign.Center,
+                                        color = Constants.COLOR_TEXT,
+                                    )
+                                },
+                                textStyle = TextStyle(
+                                    fontFamily = fontFamily,
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.W100,
+                                    lineHeight = 16.sp,
+                                    textAlign = TextAlign.Start,
+                                    color = Constants.COLOR_TEXT
+                                ),
+                                onValueChange = {
+                                    announcementImageLink = it
+                                },
+                                colors = TextFieldDefaults.outlinedTextFieldColors(
+                                    backgroundColor = Constants.COLOR_BG,
+                                    textColor = Constants.COLOR_TEXT,
+                                    unfocusedLabelColor = Constants.COLOR_TEXT,
+                                    focusedLabelColor = Constants.COLOR_TEXT,
+                                    placeholderColor = Constants.COLOR_TEXT,
+                                    leadingIconColor = Constants.COLOR_TEXT,
+                                ),
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
+                            )
+
+                            if (announcementType == "Image" && announcementImageLink.isBlank())
+                                AsyncImage(
+                                    model = announcementImageLink,
+                                    contentDescription = "Image Preview",
+                                )
+                        }
                     }
 
                     TextButton(
@@ -358,7 +417,10 @@ fun App() {
                         onClick = {
                             coroutineScope.launch(Dispatchers.Default) {
 
-                                if (announcementTitle.isBlank()) {
+                                if (
+                                    announcementTitle.isBlank() ||
+                                    (announcementType == "Image" && announcementImageLink.isBlank())
+                                ) {
                                     buttonText = "Field Empty!!"
                                     delay(1000)
                                     buttonText = "Submit"
