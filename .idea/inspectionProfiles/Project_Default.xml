@@ -24,7 +24,7 @@
     </inspection_tool>
     <inspection_tool class="AccessToStaticFieldLockedOnInstance" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="AddVarianceModifier" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
-    <inspection_tool class="AlphaUnsortedPropertiesFile" enabled="true" level="ERROR" enabled_by_default="true" />
+    <inspection_tool class="AlphaUnsortedPropertiesFile" enabled="false" level="ERROR" enabled_by_default="false" />
     <inspection_tool class="AmbiguousFieldAccess" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="AmbiguousMethodCall" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="AndroidDomInspection" enabled="false" level="ERROR" enabled_by_default="false" />
@@ -39,7 +39,6 @@
     <inspection_tool class="AndroidLintAlwaysShowAction" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="AndroidLintAnimatorKeep" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="AndroidLintAppCompatCustomView" enabled="false" level="ERROR" enabled_by_default="false" />
-    <inspection_tool class="AndroidLintAppCompatMethod" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="AndroidLintAppCompatResource" enabled="false" level="ERROR" enabled_by_default="false" />
     <inspection_tool class="AndroidLintAppLinkUrlError" enabled="false" level="ERROR" enabled_by_default="false" />
     <inspection_tool class="AndroidLintApplySharedPref" enabled="false" level="WARNING" enabled_by_default="false" />
@@ -1389,7 +1388,6 @@
     <inspection_tool class="IndexZeroUsage" enabled="true" level="ERROR" enabled_by_default="true" />
     <inspection_tool class="InfiniteLoopJS" enabled="true" level="ERROR" enabled_by_default="true" />
     <inspection_tool class="InfiniteLoopStatement" enabled="true" level="ERROR" enabled_by_default="true" />
-    <inspection_tool class="InfiniteRecursion" enabled="true" level="ERROR" enabled_by_default="true" />
     <inspection_tool class="InfiniteRecursionJS" enabled="true" level="ERROR" enabled_by_default="true" />
     <inspection_tool class="InjectedReferences" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="InjectionNotApplicable" enabled="false" level="WARNING" enabled_by_default="false" />
