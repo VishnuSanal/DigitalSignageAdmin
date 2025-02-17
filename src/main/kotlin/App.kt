@@ -144,6 +144,18 @@ fun App() {
                                         textAlign = TextAlign.Start,
                                         color = Constants.COLOR_TEXT
                                     )
+
+                                if (it.imagePath != null)
+                                    AsyncImage(
+                                        modifier = Modifier
+                                            .wrapContentHeight()
+                                            .wrapContentWidth()
+                                            .padding(16.dp),
+                                        model = it.imagePath,
+                                        contentDescription = "Image Listing",
+                                        placeholder = painterResource("error.png"),
+                                        error = painterResource("error.png"),
+                                    )
                             }
 
                             IconButton(modifier = Modifier.align(Alignment.CenterVertically)
@@ -207,6 +219,7 @@ fun App() {
                     addEditDialogEditItem?.imagePath ?: ""
                 )
             }
+            var isImageValid by remember { mutableStateOf(false) }
 
             var buttonText by remember {
                 mutableStateOf(
@@ -400,10 +413,17 @@ fun App() {
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
                             )
 
-                            if (announcementType == "Image" && announcementImageLink.isBlank())
+                            if (announcementType == "Image")
                                 AsyncImage(
+                                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                                        .padding(16.dp),
                                     model = announcementImageLink,
                                     contentDescription = "Image Preview",
+                                    placeholder = painterResource("error.png"),
+                                    error = painterResource("error.png"),
+                                    onSuccess = { isImageValid = true },
+                                    onError = { isImageValid = false },
+                                    onLoading = { isImageValid = false },
                                 )
                         }
                     }
@@ -419,9 +439,9 @@ fun App() {
 
                                 if (
                                     announcementTitle.isBlank() ||
-                                    (announcementType == "Image" && announcementImageLink.isBlank())
+                                    (announcementType == "Image" && (announcementImageLink.isBlank() || !isImageValid))
                                 ) {
-                                    buttonText = "Field Empty!!"
+                                    buttonText = "Invalid Inputs!!"
                                     delay(1000)
                                     buttonText = "Submit"
 
@@ -432,6 +452,7 @@ fun App() {
 
                                 when (announcementType) {
                                     "Text" -> announcement.message = announcementMessage.trim()
+                                    "Image" -> announcement.imagePath = announcementImageLink.trim()
                                 }
 
                                 if (addEditDialogEditItem != null)
