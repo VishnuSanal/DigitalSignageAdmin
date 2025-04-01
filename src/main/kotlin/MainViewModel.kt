@@ -1,6 +1,8 @@
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -15,10 +17,39 @@ class MainViewModel : ViewModel() {
     )
     val announcements: StateFlow<List<Announcement>> = _announcements
 
+    private var authToken: String? = null
+
     init {
         logger.info("init")
         fetch()
     }
+
+    fun signIn(email: String, password: String): Deferred<Boolean> {
+        return viewModelScope.async(Dispatchers.Default) {
+            try {
+                val response =
+                    firebaseAuthAPI.signIn(Constants.BAZOOKA, AuthRequest(email, password))
+
+                if (response.isSuccessful) {
+                    if (response.body() != null) {
+                        val body = response.body()!!
+                        authToken = body.idToken
+
+                        logger.info("User signed in: ${body.idToken}")
+
+                        return@async true
+                    } else {
+                        logger.error("Sign-in failed: ${response.errorBody()}")
+                    }
+                }
+            } catch (e: Exception) {
+                logger.error("Sign-in failed: ${e.message}")
+            }
+            return@async false
+        }
+    }
+
+    fun getAuthToken(): String? = authToken
 
     fun fetch() {
         viewModelScope.launch(Dispatchers.Default) {
@@ -71,7 +102,10 @@ class MainViewModel : ViewModel() {
 
                 newList.add(announcement)
 
-                firebaseDatabaseAPI.setAnnouncements(newList)
+                if (getAuthToken() != null)
+                    firebaseDatabaseAPI.setAnnouncements(newList)
+                else
+                    logger.error("Add: User not authenticated")
 
                 fetch()
             } catch (e: Exception) {
@@ -97,7 +131,10 @@ class MainViewModel : ViewModel() {
                 newList.remove(oldAnnouncement)
                 newList.add(announcement)
 
-                firebaseDatabaseAPI.setAnnouncements(newList)
+                if (getAuthToken() != null)
+                    firebaseDatabaseAPI.setAnnouncements(newList)
+                else
+                    logger.error("Edit: User not authenticated")
 
                 fetch()
             } catch (e: Exception) {
@@ -122,7 +159,10 @@ class MainViewModel : ViewModel() {
 
                 newList.remove(announcement)
 
-                firebaseDatabaseAPI.setAnnouncements(newList)
+                if (getAuthToken() != null)
+                    firebaseDatabaseAPI.setAnnouncements(newList)
+                else
+                    logger.error("Delete: User not authenticated")
 
                 fetch()
             } catch (e: Exception) {

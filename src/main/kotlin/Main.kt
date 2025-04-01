@@ -1,3 +1,7 @@
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import com.google.gson.GsonBuilder
@@ -23,11 +27,27 @@ val firebaseDatabaseAPI: FirebaseDatabaseAPI =
         )
     ).build().create(FirebaseDatabaseAPI::class.java);
 
+val firebaseAuthAPI: FirebaseAuthApi =
+    Retrofit.Builder().baseUrl(Constants.AUTH_BASE_URL).client(
+        OkHttpClient.Builder().addInterceptor(
+            HttpLoggingInterceptor().setLevel(Constants.LOGLEVEL)
+        ).build()
+    ).addConverterFactory(GsonConverterFactory.create())
+        .build().create(FirebaseAuthApi::class.java);
+
 val logger: Logger = LoggerFactory.getLogger("DigitalSignageAdmin")
 
 fun main() = application {
     Window(onCloseRequest = ::exitApplication) {
-        App()
+        val mainViewModel = remember { MainViewModel() }
+
+        var isAuthenticated by remember { mutableStateOf(mainViewModel.getAuthToken() != null) }
+
+        if (isAuthenticated) {
+            App(mainViewModel)
+        } else {
+            AuthScreen(mainViewModel) { isAuthenticated = true }
+        }
     }
 }
 

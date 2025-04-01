@@ -9,6 +9,10 @@ object Constants {
 
     val LOGLEVEL: HttpLoggingInterceptor.Level = HttpLoggingInterceptor.Level.BASIC
 
+    const val BAZOOKA = "AIzaSyCrY-F5OneuA-RqmcAVQ76MZYahePCTtqQ"
+
+    const val AUTH_BASE_URL = "https://identitytoolkit.googleapis.com/"
+
     const val DB_BASE_URL = "https://digital-signage-gec-pkd-default-rtdb.firebaseio.com/"
 //    const val DB_BASE_URL = "https://gedigitalsignage-gecpkd-default-rtdb.firebaseio.com/" // DEBUG
 }

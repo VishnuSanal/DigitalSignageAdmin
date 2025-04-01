@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -40,13 +41,19 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.platform.Font
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -61,10 +68,7 @@ private val fontFamily = FontFamily(Font(resource = "poppins.ttf"))
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 @Preview
-fun App() {
-
-    val mainViewModel = remember { MainViewModel() }
-
+fun App(mainViewModel: MainViewModel) {
     val coroutineScope = rememberCoroutineScope()
 
     val contentList by mainViewModel.announcements.collectAsState()
@@ -92,19 +96,20 @@ fun App() {
                     color = Constants.COLOR_TEXT
                 )
 
-                IconButton(modifier = Modifier.align(Alignment.CenterVertically).wrapContentWidth()
-                    .fillMaxWidth().size(96.dp).aspectRatio(1f).background(Constants.COLOR_BG)
-                    .padding(8.dp), onClick = {
-                    addEditDialogEditItem = null
-                    showAddEditDialog = true
-                }, content = {
-                    Icon(
-                        modifier = Modifier.wrapContentWidth().fillMaxWidth(),
-                        painter = painterResource("add.png"),
-                        tint = Constants.COLOR_TEXT,
-                        contentDescription = "add icon"
-                    )
-                })
+                IconButton(
+                    modifier = Modifier.align(Alignment.CenterVertically).wrapContentWidth()
+                        .fillMaxWidth().size(96.dp).aspectRatio(1f).background(Constants.COLOR_BG)
+                        .padding(8.dp), onClick = {
+                        addEditDialogEditItem = null
+                        showAddEditDialog = true
+                    }, content = {
+                        Icon(
+                            modifier = Modifier.wrapContentWidth().fillMaxWidth(),
+                            painter = painterResource("add.png"),
+                            tint = Constants.COLOR_TEXT,
+                            contentDescription = "add icon"
+                        )
+                    })
             }
 
             LazyColumn(
@@ -158,34 +163,36 @@ fun App() {
                                     )
                             }
 
-                            IconButton(modifier = Modifier.align(Alignment.CenterVertically)
-                                .padding(16.dp).size(48.dp).aspectRatio(1f), onClick = {
-                                coroutineScope.launch(Dispatchers.Default) {
-                                    mainViewModel.delete(it)
-                                }
-                            }, content = {
-                                Icon(
-                                    modifier = Modifier.wrapContentWidth().fillMaxWidth(),
-                                    painter = painterResource("delete.png"),
-                                    tint = Constants.COLOR_TEXT,
-                                    contentDescription = "delete icon"
-                                )
-                            })
+                            IconButton(
+                                modifier = Modifier.align(Alignment.CenterVertically)
+                                    .padding(16.dp).size(48.dp).aspectRatio(1f), onClick = {
+                                    coroutineScope.launch(Dispatchers.Default) {
+                                        mainViewModel.delete(it)
+                                    }
+                                }, content = {
+                                    Icon(
+                                        modifier = Modifier.wrapContentWidth().fillMaxWidth(),
+                                        painter = painterResource("delete.png"),
+                                        tint = Constants.COLOR_TEXT,
+                                        contentDescription = "delete icon"
+                                    )
+                                })
 
-                            IconButton(modifier = Modifier.align(Alignment.CenterVertically)
-                                .padding(16.dp).size(48.dp).aspectRatio(1f), onClick = {
-                                coroutineScope.launch(Dispatchers.Default) {
-                                    addEditDialogEditItem = it
-                                    showAddEditDialog = true
-                                }
-                            }, content = {
-                                Icon(
-                                    modifier = Modifier.wrapContentWidth().fillMaxWidth(),
-                                    painter = painterResource("edit.png"),
-                                    tint = Constants.COLOR_TEXT,
-                                    contentDescription = "edit icon"
-                                )
-                            })
+                            IconButton(
+                                modifier = Modifier.align(Alignment.CenterVertically)
+                                    .padding(16.dp).size(48.dp).aspectRatio(1f), onClick = {
+                                    coroutineScope.launch(Dispatchers.Default) {
+                                        addEditDialogEditItem = it
+                                        showAddEditDialog = true
+                                    }
+                                }, content = {
+                                    Icon(
+                                        modifier = Modifier.wrapContentWidth().fillMaxWidth(),
+                                        painter = painterResource("edit.png"),
+                                        tint = Constants.COLOR_TEXT,
+                                        contentDescription = "edit icon"
+                                    )
+                                })
                         }
                     }
                 }
@@ -479,5 +486,89 @@ fun App() {
                 }
             }
         }
+    }
+}
+
+@Composable
+fun AuthScreen(mainViewModel: MainViewModel, onAuthSuccess: () -> Unit) {
+    Column(
+        Modifier.fillMaxWidth().fillMaxHeight(), verticalArrangement = Arrangement.Center
+    ) {
+
+        Text(
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+            text = "Sign in",
+            fontSize = 32.sp,
+            fontWeight = FontWeight.Medium
+        )
+
+        var email by remember { mutableStateOf("") }
+        var password by remember { mutableStateOf("") }
+        var passwordVisibility: Boolean by remember { mutableStateOf(false) }
+        val coroutineScope = rememberCoroutineScope()
+
+        OutlinedTextField(
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+                .padding(16.dp, 16.dp, 16.dp, 0.dp).fillMaxWidth(0.5f),
+            value = email,
+            onValueChange = {
+                email = it
+            },
+            label = { Text("Email ID") },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+            leadingIcon = @Composable { Icon(painterResource("badge.png"), "message icon") }
+        )
+
+        OutlinedTextField(
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+                .padding(16.dp, 16.dp, 16.dp, 0.dp).fillMaxWidth(0.5f),
+            value = password,
+            onValueChange = {
+                password = it
+            },
+            label = { Text("Password") },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            leadingIcon = @Composable { Icon(painterResource("padlock.png"), "padlock icon") },
+            visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
+            trailingIcon = @Composable {
+                IconButton(onClick = {
+                    passwordVisibility = !passwordVisibility
+                }) {
+                    if (passwordVisibility) Icon(painterResource("pass_on.png"), "")
+                    else Icon(painterResource("pass_off.png"), "")
+                }
+            }
+        )
+
+        var buttonText by remember { mutableStateOf("Login") }
+
+        TextButton(
+            modifier = Modifier.align(Alignment.CenterHorizontally).fillMaxWidth(0.5f)
+                .padding(16.dp, 16.dp, 16.dp, 0.dp),
+            onClick = {
+                buttonText = "Please Wait..."
+
+                coroutineScope.launch {
+                    val success = mainViewModel.signIn(email, password).await()
+                    if (success) {
+                        onAuthSuccess()
+                        buttonText = "Success!"
+                    } else {
+                        buttonText = "Authentication Failed"
+                        delay(1000)
+                        buttonText = "Login"
+                    }
+                }
+            },
+            content = {
+                Text(text = buildAnnotatedString {
+                    withStyle(SpanStyle(color = Color.White)) {
+                        append(buttonText)
+                    }
+                }, fontSize = 16.sp, fontWeight = FontWeight.Light)
+            },
+            colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF292D32)),
+            shape = RoundedCornerShape(32.dp)
+        )
     }
 }
