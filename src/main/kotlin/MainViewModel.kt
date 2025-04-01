@@ -103,7 +103,7 @@ class MainViewModel : ViewModel() {
                 newList.add(announcement)
 
                 if (getAuthToken() != null)
-                    firebaseDatabaseAPI.setAnnouncements(newList)
+                    firebaseDatabaseAPI.setAnnouncements(getAuthToken()!!, newList)
                 else
                     logger.error("Add: User not authenticated")
 
@@ -132,7 +132,7 @@ class MainViewModel : ViewModel() {
                 newList.add(announcement)
 
                 if (getAuthToken() != null)
-                    firebaseDatabaseAPI.setAnnouncements(newList)
+                    firebaseDatabaseAPI.setAnnouncements(getAuthToken()!!, newList)
                 else
                     logger.error("Edit: User not authenticated")
 
@@ -160,7 +160,7 @@ class MainViewModel : ViewModel() {
                 newList.remove(announcement)
 
                 if (getAuthToken() != null)
-                    firebaseDatabaseAPI.setAnnouncements(newList)
+                    firebaseDatabaseAPI.setAnnouncements(getAuthToken()!!, newList)
                 else
                     logger.error("Delete: User not authenticated")
 
