@@ -57,3 +57,29 @@ jobs:
         with:
           name: admin.exe
           path: build/compose/binaries/main/exe/*.exe
+
+  build-macos:
+    name: Build Executable on MacOS
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build DMG
+        run: ./gradlew packageDmg
+
+      - name: Upload DMG
+        uses: actions/upload-artifact@v4
+        with:
+          name: admin.dmg
+          path: build/compose/binaries/main/exe/*.dmg
